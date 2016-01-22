@@ -19,6 +19,13 @@ import android.widget.ListView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import org.mcsoxford.rss.RSSFeed;
+import org.mcsoxford.rss.RSSItem;
+import org.mcsoxford.rss.RSSReader;
+import org.mcsoxford.rss.RSSReaderException;
+
+import java.util.ArrayList;
+
 
 /**
  * Creado por Hermosa Programaci�n
@@ -48,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private FeedAdapter adapter;
 
+    private RssAdapter rssAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,61 +68,63 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            ClienteHttpVolley.getInstance(this).addToRequestQueue(
-                    new XmlRequest<>(
-                            URL_FEED,
-                            Rss.class,
-                            null,
-                            new Response.Listener<Rss>() {
-                                @Override
-                                public void onResponse(Rss response) {
-                                    // Caching
-                                    FeedDatabase.getInstance(MainActivity.this).
-                                            sincronizarEntradas(response.getChannel().getItems());
-                                    // Carga inicial de datos...
-                                    new LoadData().execute();
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d(TAG, "Error Volley: " + error.getMessage());
-                                }
-                            }
-                    )
-            );
-        } else {
-            Log.i(TAG, "La conexi�n a internet no est� disponible");
-            adapter= new FeedAdapter(
-                    this,
-                    FeedDatabase.getInstance(this).obtenerEntradas(),
-                    SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-            listView.setAdapter(adapter);
+          if (networkInfo != null && networkInfo.isConnected()) {
+            new LoadRssData().execute("http://ep00.epimg.net/rss/tags/noticias_mas_vistas.xml");
+//            ClienteHttpVolley.getInstance(this).addToRequestQueue(
+//
+//                    new XmlRequest<>(
+//                            URL_FEED,
+//                            Rss.class,
+//                            null,
+//                            new Response.Listener<Rss>() {
+//                                @Override
+//                                public void onResponse(Rss response) {
+//                                    // Caching
+//                                    FeedDatabase.getInstance(MainActivity.this).
+//                                            sincronizarEntradas(response.getChannel().getItems());
+//                                    // Carga inicial de datos...
+//                                    new LoadData().execute();
+//                                }
+//                            },
+//                            new Response.ErrorListener() {
+//                                @Override
+//                                public void onErrorResponse(VolleyError error) {
+//                                    Log.d(TAG, "Error Volley: " + error.getMessage());
+//                                }
+//                            }
+//                    )
+//            );
+//        } else {
+//            Log.i(TAG, "La conexi�n a internet no est� disponible");
+//            adapter= new FeedAdapter(
+//                    this,
+//                    FeedDatabase.getInstance(this).obtenerEntradas(),
+//                    SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+//            listView.setAdapter(adapter);
         }
 
 
 
 
         // Regisgrar escucha de la lista
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor c = (Cursor) adapter.getItem(position);
-
-                // Obtene url de la entrada seleccionada
-                String url = c.getString(c.getColumnIndex(ScriptDatabase.ColumnEntradas.URL));
-
-                // Nuevo intent expl�cito
-                Intent i = new Intent(MainActivity.this, DetailActivity.class);
-
-                // Setear url
-                i.putExtra("url-extra", url);
-
-                // Iniciar actividad
-                startActivity(i);
-            }
-        });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Cursor c = (Cursor) adapter.getItem(position);
+//
+//                // Obtene url de la entrada seleccionada
+//                String url = c.getString(c.getColumnIndex(ScriptDatabase.ColumnEntradas.URL));
+//
+//                // Nuevo intent expl�cito
+//                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+//
+//                // Setear url
+//                i.putExtra("url-extra", url);
+//
+//                // Iniciar actividad
+//                startActivity(i);
+//            }
+//        });
     }
 
     @Override
@@ -168,6 +179,34 @@ public class MainActivity extends AppCompatActivity {
 
             // Relacionar la lista con el adaptador
             listView.setAdapter(adapter);
+        }
+    }
+    public class LoadRssData extends AsyncTask<String,Void,RSSFeed>{
+
+        @Override
+        protected RSSFeed doInBackground(String... params) {
+            RSSReader test = new RSSReader();
+            String uri = params[0];
+            try {
+                RSSFeed feed = test.load(uri);
+                return feed;
+
+            } catch (RSSReaderException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(RSSFeed rssFeed) {
+            super.onPostExecute(rssFeed);
+            if(rssFeed != null) {
+                Log.i(TAG, "El feed es: " + rssFeed.getItems().toString());
+                ArrayList<RSSItem> auxArray = new ArrayList<RSSItem>();
+                auxArray.addAll(rssFeed.getItems());
+                rssAdapter = new RssAdapter(MainActivity.this, auxArray);
+                listView.setAdapter(rssAdapter);
+            }
         }
     }
 
