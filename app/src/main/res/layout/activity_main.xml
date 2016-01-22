@@ -1,0 +1,26 @@
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/lista"
+    android:divider="@null"
+    android:dividerHeight="0dp"
+    android:background="#F1F5F8"
+    android:padding="6dp"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/stat_notify_sync_noanim"
+         />
+
+    <!--android:src="@android:drawable/ic_input_add"-->
+
+</FrameLayout>
