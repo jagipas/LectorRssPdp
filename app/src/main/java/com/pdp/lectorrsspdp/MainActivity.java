@@ -57,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
 
     private RssAdapter rssAdapter;
 
+    private ArrayList<Rss> rssList;
+
+    private ArrayList<String> categorias;
+
+    private RssItemContainer itemContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,19 +74,27 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-          if (networkInfo != null && networkInfo.isConnected()) {
-            new LoadRssData().execute("http://nypost.com/feed/");
+
+        //incializar arrays
+        categorias = new ArrayList<String>();
+        addCategorias();
+        rssList = new ArrayList<Rss>();
+        addDefaultFeeds();
+        itemContainer = new RssItemContainer();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new LoadRssData().execute();
         }
 
         // Regisgrar escucha de la lista
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                RSSItem item = (RSSItem) rssAdapter.getItem(position);
+                RssAdapterItem item = (RssAdapterItem) rssAdapter.getItem(position);
 
                 // Obtene url de la entrada seleccionada
-                Log.i(TAG,"Url clicada: " + item.getLink());
-                String url = item.getLink().toString();
+                Log.i(TAG,"Url clicada: " + item.getItem().getLink());
+                String url = item.getItem().getLink().toString();
 
                 // Nuevo intent expl�cito
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
@@ -94,6 +108,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void addCategorias() {
+        this.categorias.add("Todos");
+        this.categorias.add("Noticias");
+        this.categorias.add("Deportes");
+    }
+
+    private void addDefaultFeeds() {
+        this.rssList.add(new Rss("http://ep00.epimg.net/rss/elpais/portada.xml","Noticias"));
+        this.rssList.add(new Rss("http://as.com/rss/tags/ultimas_noticias.xml","Deportes"));
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -125,31 +149,39 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class LoadRssData extends AsyncTask<String,Void,RSSFeed>{
+    public class LoadRssData extends AsyncTask<Void,Void,ArrayList<RSSFeed>>{
 
         @Override
-        protected RSSFeed doInBackground(String... params) {
-            RSSReader test = new RSSReader();
-            String uri = params[0];
+        protected ArrayList<RSSFeed> doInBackground(Void... params) {
+            RSSReader reader = new RSSReader();
+            ArrayList<RSSFeed> feeds = new ArrayList<RSSFeed>();
             try {
-                RSSFeed feed = test.load(uri);
-                return feed;
+
+                for(Rss r : rssList){
+                    RSSFeed feed = reader.load(r.getUrl());
+                    feeds.add(feed);
+                }
+
+                return feeds;
 
             } catch (RSSReaderException e) {
                 e.printStackTrace();
             }
-            return null;
+            return feeds;
         }
 
         @Override
-        protected void onPostExecute(RSSFeed rssFeed) {
-            super.onPostExecute(rssFeed);
-            if(rssFeed != null) {
-                Log.i(TAG, "El feed es: " + rssFeed.getItems().toString());
-                ArrayList<RSSItem> auxArray = new ArrayList<RSSItem>();
-                auxArray.addAll(rssFeed.getItems());
+        protected void onPostExecute(ArrayList<RSSFeed> rssFeeds) {
+            super.onPostExecute(rssFeeds);
+            if(rssFeeds != null) {
+                itemContainer.empty();
+                for(RSSFeed f : rssFeeds){
+                    for(RSSItem i : f.getItems()){
+                        itemContainer.addItem(new RssAdapterItem(i,f.getTitle()));
+                    }
+                }
 
-                rssAdapter = new RssAdapter(MainActivity.this, rssFeed.getTitle(),auxArray);
+                rssAdapter = new RssAdapter(MainActivity.this,itemContainer.getItems());
                 listView.setAdapter(rssAdapter);
             }
         }
