@@ -37,7 +37,7 @@ import java.util.ArrayList;
  * Actividad principal que representa el Home de la aplicaci�n
  */
 
-public class MainActivity extends AppCompatActivity implements DialogFiltrosListener{
+public class MainActivity extends AppCompatActivity implements DialogFiltrosListener,DialogAddListener{
 
     /*
     Etiqueta de depuraci�n
@@ -92,13 +92,14 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
 
             @Override
             public void onClick(View v) {
-                
+                DialogFragment dialogAdd = new DialogAdd();
+                dialogAdd.show(getSupportFragmentManager(), "DialogAdd");
             }
         });
         // Obtener la lista
         listView = (ListView)findViewById(R.id.lista);
 
-        final FloatingActionButton fabUpdate = (FloatingActionButton) findViewById(R.id.add);
+        final FloatingActionButton fabUpdate = (FloatingActionButton) findViewById(R.id.update);
         fabUpdate.setOnClickListener( new View.OnClickListener(){
 
             @Override
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
         this.categorias.add("Noticias");
         this.categorias.add("Deportes");
         this.categorias.add("Tecnología");
+        this.categorias.add("Otros");
     }
 
     private void addDefaultFeeds() {
@@ -187,6 +189,12 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
     @Override
     public void onSelectedOptions(ArrayList<String> selected) {
         categorias = selected;
+        new LoadRssData().execute();
+    }
+
+    @Override
+    public void addRss(String url, String categoria) {
+        rssList.add(new Rss(url,categoria));
         new LoadRssData().execute();
     }
 

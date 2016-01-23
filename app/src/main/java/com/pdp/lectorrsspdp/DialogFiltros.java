@@ -22,10 +22,11 @@ public class DialogFiltros extends DialogFragment{
 
         // Checkeamos lo que toque;
         list = this.getArguments().getStringArrayList("categorias");
-        final boolean[] checkedCategorias = new boolean[3];
+        final boolean[] checkedCategorias = new boolean[4];
         checkedCategorias[0] = list.contains("Noticias") ? true:false;
         checkedCategorias[1] = list.contains("Deportes") ? true:false;
         checkedCategorias[2] = list.contains("Tecnología") ? true:false;
+        checkedCategorias[3] = list.contains("Otros") ? true:false;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Filtros").setMultiChoiceItems(R.array.filter_selection, checkedCategorias, new DialogInterface.OnMultiChoiceClickListener() {
@@ -52,9 +53,5 @@ public class DialogFiltros extends DialogFragment{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         filtrosListener = (DialogFiltrosListener) activity;
-    }
-
-    public void setList(ArrayList<String> list) {
-        this.list = list;
     }
 }
