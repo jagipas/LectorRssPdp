@@ -1,5 +1,6 @@
 package com.pdp.lectorrsspdp;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.android.volley.Response;
@@ -33,7 +36,7 @@ import java.util.ArrayList;
  * Actividad principal que representa el Home de la aplicaci�n
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogFiltrosListener{
 
     /*
     Etiqueta de depuraci�n
@@ -67,6 +70,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Botón filtros
+        final Button btnFiltros = (Button) findViewById(R.id.btnFiltros);
+        btnFiltros.setOnClickListener( new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                DialogFragment dialogFiltros = new DialogFiltros();
+                Bundle bundle = new Bundle();
+                bundle.putStringArrayList("categorias",categorias);
+                dialogFiltros.setArguments(bundle);
+                dialogFiltros.show(getSupportFragmentManager(),"DialogFiltros");
+            }
+        });
 
         // Obtener la lista
         listView = (ListView)findViewById(R.id.lista);
@@ -109,9 +126,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addCategorias() {
-        this.categorias.add("Todos");
         this.categorias.add("Noticias");
         this.categorias.add("Deportes");
+        this.categorias.add("Tecnología");
     }
 
     private void addDefaultFeeds() {
@@ -141,12 +158,17 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         // Item boton conectar a un dispositivo bluetooth
         if(id ==R.id.action_settings){
-
             return true;
         }
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSelectedOptions(ArrayList<String> selected) {
+        Log.i(TAG,"Las opciones elegidas son" + selected);
+        categorias = selected;
     }
 
     public class LoadRssData extends AsyncTask<Void,Void,ArrayList<RSSFeed>>{
@@ -186,6 +208,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
 }
