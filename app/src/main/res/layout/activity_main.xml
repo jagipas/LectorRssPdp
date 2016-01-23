@@ -1,26 +1,67 @@
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/lista"
-    android:divider="@null"
-    android:dividerHeight="0dp"
-    android:background="#F1F5F8"
-    android:padding="6dp"/>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="0.50"
+                android:layout_height="wrap_content"
+                android:text="Filtros"
+                android:id="@+id/button" />
+            <Spinner
+                android:layout_width="0dp"
+                android:layout_height="39dp"
+                android:layout_weight="0.50"
+                android:id="@+id/spOrden" />
+
+        </LinearLayout>
+
+        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lista"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:background="#F1F5F8"
+        android:padding="1dp"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/stat_notify_sync_noanim"
-         />
-
+        android:layout_gravity="right|bottom">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@android:drawable/ic_input_add"
+            />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@android:drawable/stat_notify_sync_noanim"
+            />
+    </LinearLayout>
+</FrameLayout>
     <!--android:src="@android:drawable/ic_input_add"-->
 
-</FrameLayout>
