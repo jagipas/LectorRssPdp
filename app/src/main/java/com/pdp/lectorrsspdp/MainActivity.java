@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
     public void onSelectedOptions(ArrayList<String> selected) {
         Log.i(TAG,"Las opciones elegidas son" + selected);
         categorias = selected;
+        new LoadRssData().execute();
     }
 
     public class LoadRssData extends AsyncTask<Void,Void,ArrayList<RSSFeed>>{
@@ -180,8 +181,10 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
             try {
 
                 for(Rss r : rssList){
-                    RSSFeed feed = reader.load(r.getUrl());
-                    feeds.add(feed);
+                    if(categorias.contains(r.getCategoria())) {
+                        RSSFeed feed = reader.load(r.getUrl());
+                        feeds.add(feed);
+                    }
                 }
 
                 return feeds;
