@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -81,18 +82,36 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
                 Bundle bundle = new Bundle();
                 bundle.putStringArrayList("categorias",categorias);
                 dialogFiltros.setArguments(bundle);
-                dialogFiltros.show(getSupportFragmentManager(),"DialogFiltros");
+                dialogFiltros.show(getSupportFragmentManager(), "DialogFiltros");
             }
         });
 
+        // Botón añadir
+        final Button btnAnyadir = (Button) findViewById(R.id.btnAdd);
+        btnAnyadir.setOnClickListener( new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
         // Obtener la lista
         listView = (ListView)findViewById(R.id.lista);
+
+        final FloatingActionButton fabUpdate = (FloatingActionButton) findViewById(R.id.add);
+        fabUpdate.setOnClickListener( new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                new LoadRssData().execute();
+            }
+        });
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-        //incializar arrays
+        // Incializar arrays
         categorias = new ArrayList<String>();
         addCategorias();
         rssList = new ArrayList<Rss>();
@@ -167,45 +186,46 @@ public class MainActivity extends AppCompatActivity implements DialogFiltrosList
 
     @Override
     public void onSelectedOptions(ArrayList<String> selected) {
-        Log.i(TAG,"Las opciones elegidas son" + selected);
         categorias = selected;
         new LoadRssData().execute();
     }
 
-    public class LoadRssData extends AsyncTask<Void,Void,ArrayList<RSSFeed>>{
+    public class LoadRssData extends AsyncTask<Void,Void,String>{
 
         @Override
-        protected ArrayList<RSSFeed> doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             RSSReader reader = new RSSReader();
-            ArrayList<RSSFeed> feeds = new ArrayList<RSSFeed>();
+            ArrayList<RssFeedContainer> feeds = new ArrayList<RssFeedContainer>();
             try {
 
                 for(Rss r : rssList){
                     if(categorias.contains(r.getCategoria())) {
                         RSSFeed feed = reader.load(r.getUrl());
-                        feeds.add(feed);
+                        feeds.add(new RssFeedContainer(r.getCategoria(),feed));
+                    }
+                    if(feeds != null) {
+                        itemContainer.empty();
+                        for(RssFeedContainer f : feeds){
+                            for(RSSItem i : f.getFeed().getItems()){
+                                itemContainer.addItem(new RssAdapterItem(i,f.getFeed().getTitle(),f.getCategoria()));
+                            }
+                        }
+                        itemContainer.sortByDate();
                     }
                 }
 
-                return feeds;
+                return "Exito";
 
             } catch (RSSReaderException e) {
                 e.printStackTrace();
             }
-            return feeds;
+            return "Error";
         }
 
         @Override
-        protected void onPostExecute(ArrayList<RSSFeed> rssFeeds) {
-            super.onPostExecute(rssFeeds);
-            if(rssFeeds != null) {
-                itemContainer.empty();
-                for(RSSFeed f : rssFeeds){
-                    for(RSSItem i : f.getItems()){
-                        itemContainer.addItem(new RssAdapterItem(i,f.getTitle()));
-                    }
-                }
-
+        protected void onPostExecute(String info) {
+            super.onPostExecute(info);
+            if(info.equals("Exito")) {
                 rssAdapter = new RssAdapter(MainActivity.this,itemContainer.getItems());
                 listView.setAdapter(rssAdapter);
             }

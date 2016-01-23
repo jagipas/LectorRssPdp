@@ -3,6 +3,7 @@ package com.pdp.lectorrsspdp;
 import org.mcsoxford.rss.RSSItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,5 +26,9 @@ public class RssItemContainer {
 
     public ArrayList<RssAdapterItem> getItems() {
         return items;
+    }
+
+    public void sortByDate(){
+        Collections.sort(items,new RssAdapterItemDateComparator());
     }
 }

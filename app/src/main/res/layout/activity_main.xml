@@ -20,11 +20,12 @@
                 android:layout_height="wrap_content"
                 android:text="Filtros"
                 android:id="@+id/btnFiltros" />
-            <Spinner
+            <Button
                 android:layout_width="0dp"
-                android:layout_height="39dp"
                 android:layout_weight="0.50"
-                android:id="@+id/spOrden" />
+                android:layout_height="wrap_content"
+                android:text="Añadir RSS"
+                android:id="@+id/btnAdd" />
 
         </LinearLayout>
 
@@ -40,19 +41,7 @@
     </LinearLayout>
 
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right|bottom">
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@android:drawable/ic_input_add"
-            />
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/update"
             android:layout_width="wrap_content"
@@ -61,7 +50,9 @@
             android:layout_margin="@dimen/fab_margin"
             android:src="@android:drawable/stat_notify_sync_noanim"
             />
-    </LinearLayout>
+
+
+
 </FrameLayout>
     <!--android:src="@android:drawable/ic_input_add"-->
 
