@@ -26,7 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile files('libs/Simple-Rss2-Android.jar')
-    compile files('libs/simple-xml-2.7.1.jar')
     compile 'com.github.ahorn:android-rss:master'
 }
