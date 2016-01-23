@@ -10,11 +10,12 @@ import android.widget.TextView;
 
 import org.mcsoxford.rss.RSSItem;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
-/**
- * Created by Marc on 22/01/2016.
- */
+
 public class RssAdapter extends ArrayAdapter<RSSItem> {
 
     private String rssTitle;
@@ -36,11 +37,15 @@ public class RssAdapter extends ArrayAdapter<RSSItem> {
         TextView tvPublisher = (TextView) convertView.findViewById(R.id.publisher);
         TextView tvTitulo = (TextView) convertView.findViewById(R.id.titulo);
         TextView tvDescripcion = (TextView) convertView.findViewById(R.id.descripcion);
+        TextView tvFecha = (TextView) convertView.findViewById(R.id.fechaPub);
         ImageView ivThumbnail = (ImageView) convertView.findViewById(R.id.imagen);
 
         tvPublisher.setText(this.rssTitle);
         tvTitulo.setText(item.getTitle());
         tvDescripcion.setText(item.getDescription());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm", new Locale("es"));
+        tvFecha.setText(df.format(item.getPubDate()));
 
         if(item.getThumbnails().size()>0) {
             ivThumbnail.setImageURI(item.getThumbnails().get(0).getUrl());
